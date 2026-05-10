@@ -17,6 +17,8 @@ to open dvwa use docker
 open docker 
 docker pull vulnerables/web-dvwa
 docker run --rm -it -p 80:80 vulnerables/web-dvwa
+or 
+docker run -d -p 8081:80 vulnerables/web-dvwa and open browser and type http://127.0.0.1:8081
 open browser and type http://127.0.0.1
 login username:admin,Password:password 
 click create or reset database if needed again login 
