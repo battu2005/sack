@@ -157,7 +157,7 @@ at 3rd or 4th attempt login using admin and password it will get login
 
 then in that right click->inspect->application->cookies->click on http://127.0.0.1 and copy the phsessionid 
 in private window or another window open http://127.0.0.1-->dont login
-then in that right click->inspect->application->cookies->click on http://127.0.0.1->paste the copied value and refresh the page it should login this is session hijacking
+then in that right click->inspect->application->cookies->click on http://127.0.0.1->paste the copied value and in the url bar instead of login.php type index.php it should login this is session hijacking
 
 //session fixation
 open http://127.0.0.1->dont login->in that right click->inspect->application->cookies->click on http://127.0.0.1 and see the phsessionid
