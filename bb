@@ -198,6 +198,16 @@ sned and recive msgs->write somenting and click send->down poll msgs poll it u g
 sns->create subscription->amazons sqs->our sqs
 now s3 -> upload 
 send and messages lo poll msgs our upladed item will come in sqs
+lambda code 
+def lambda_handler(event, context):
+    for record in event['Records']:
+        print("Message received from SQS:")
+        print(record['body'])
+    return {
+        'statusCode': 200,
+        'body': 'Message processed successfully'
+    }
+
 ----------------------------------------------------------------------------------------------------------------
 //week-9-elb
 Step-by-Step: AWS Application Load Balancer (ALB) with 2 EC2 Web Servers
