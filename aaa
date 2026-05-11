@@ -75,7 +75,7 @@ key pair->create security group->network->
 subnet-1a(us-east-1a)->description(NFS-SG)->
 add security group->type(NFS)->source type(anywhere)->click launch instance
 
-3.launch instance->name as efs2->amazon linux->t2.micro->key pair->selct security group->select the selected one->click launch instance
+3.launch instance->name as efs2->amazon linux->t2.micro->key pair->selct security group->select the selected one->->subnet-1bclick launch instance
 
 4.search EFS->create file system->name:optional,vpc:default,enable region-> 
 do after file created or while creating select file created->network settings->
@@ -84,10 +84,10 @@ remove the subnets or vpc and keep your nfs->save
 5.open 2 powershell->in one powershell paste efs1 ssh->sudo su->mkdir fs->yum install -y amazon-efs-utils->
 and do same for efs2 powershell
 
-6.efs->select target efs->actions->attach->mount via dns->copy command->and paste in both powershell
+6.efs->select target efs->actions->attach->mount via dns->copy command->and paste in both powershell->before paste if u get an error type mkdir efs and paste it in both cmd
 
 7.in efs1->cd directoryname->touch file.txt->echo "hello">file.txt->ls
-and in efs2 type ls you should get 
+and in efs2 type  cd directory name ->ls you should get->to check in 2nd cmd type cat filename.txt
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
