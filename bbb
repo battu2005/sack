@@ -199,75 +199,211 @@ sns->create subscription->amazons sqs->our sqs
 now s3 -> upload 
 send and messages lo poll msgs our upladed item will come in sqs
 ----------------------------------------------------------------------------------------------------------------
-//week-9
-🔹 STEP 1: Launch EC2 Instances
+//week-9-elb
+Step-by-Step: AWS Application Load Balancer (ALB) with 2 EC2 Web Servers
+STEP 1 — Launch EC2 Instance 1
 
-Go to Amazon EC2
+Go to:
 
-👉 Create 2 instances:
+AWS EC2 Console
 
-Instance 1:
-Name → webserver-1
+Click:
+Launch instance
+Configure
+Field	Value
+Name	webserver-1
+AMI	Amazon Linux
+Instance type	t2.micro
+Key pair	Select existing key
+Network Settings
+
+Allow:
+
+Type	Source
+HTTP	Anywhere
+SSH	My IP / Anywhere
+
+Launch instance.
+
+STEP 2 — Connect to webserver-1
+
+SSH:
+
+ssh -i "your-key.pem" ec2-user@PUBLIC-IP
+STEP 3 — Install Apache on webserver-1
 
 Run:
 
 sudo yum install httpd -y
+
+Start Apache:
+
 sudo systemctl start httpd
+
+Create webpage:
+
 echo "This is Server 1" | sudo tee /var/www/html/index.html
-Instance 2:
-Name → webserver-2
+STEP 4 — Launch EC2 Instance 2
+
+Repeat same steps.
+
+Configure
+Field	Value
+Name	webserver-2
+AMI	Amazon Linux
+Instance type	t2.micro
+
+Launch.
+
+STEP 5 — Connect to webserver-2
+
+SSH:
+
+ssh -i "your-key.pem" ec2-user@PUBLIC-IP
+STEP 6 — Install Apache on webserver-2
 
 Run:
 
 sudo yum install httpd -y
+
+Start Apache:
+
 sudo systemctl start httpd
+
+Create webpage:
+
 echo "This is Server 2" | sudo tee /var/www/html/index.html
-🔹 STEP 2: Create Security Group (for Load Balancer)
+STEP 7 — Create Security Group for Load Balancer
 
-Go to EC2 → Security Groups
+Go to:
 
-Name → lb-sg
-Add rule:
-HTTP (80) → Anywhere (0.0.0.0/0)
-🔹 STEP 3: Create Load Balancer
+EC2 → Security Groups
 
-Go to Elastic Load Balancer
+Click:
+Create security group
+Configure
+Field	Value
+Security group name	lb-sg
+Description	Load balancer SG
+VPC	Default
+Add Inbound Rule
+Type	Source
+HTTP	0.0.0.0/0
 
-Click Create Load Balancer
+Create security group.
+
+STEP 8 — Create Load Balancer
+
+Go to:
+
+EC2 → Load Balancers
+
+Click:
+Create Load Balancer
 Choose:
-👉 Application Load Balancer (ALB)
-Configure:
-Name → my-alb
-Scheme → Internet-facing
-IP → IPv4
-🔹 STEP 4: Select Network
-VPC → Default
-Select 2 Availability Zones
-🔹 STEP 5: Attach Security Group
+Application Load Balancer
+Click:
+Create
+STEP 9 — Configure Load Balancer
+Field	Value
+Name	my-alb
+Scheme	Internet-facing
+IP type	IPv4
+STEP 10 — Select Network
+Setting	Value
+VPC	Default VPC
 
-👉 Select:
+Select at least:
+
+2 Availability Zones
+
+AWS automatically selects subnets.
+
+STEP 11 — Attach Security Group
+
+Select:
 
 lb-sg
-🔹 STEP 6: Create Target Group
-Name → web-servers-tg
-Target type → Instance
-Protocol → HTTP
-Port → 80
+STEP 12 — Create Target Group
 
-👉 Register:
+Under:
+
+Listeners and routing
+
+Click:
+
+Create target group
+Configure
+Field	Value
+Target type	Instance
+Name	web-servers-tg
+Protocol	HTTP
+Port	80
+VPC	Default
+
+Click:
+
+Next
+STEP 13 — Register Targets
+
+Select:
 
 webserver-1
 webserver-2
-🔹 STEP 7: Create Load Balancer
 
-👉 Click Create
+Click:
 
-⏳ Wait 2–3 minutes
+Include as pending below
 
-🌐 STEP 8: Test Load Balancer
+Then:
 
-👉 Copy DNS:
+Create target group
+STEP 14 — Attach Target Group to Load Balancer
 
-my-alb-xxxx.elb.amazonaws.com
+Go back to Load Balancer creation page.
 
-👉 Open in browser
+Under:
+
+Default action
+
+Select:
+
+web-servers-tg
+STEP 15 — Create Load Balancer
+
+Click:
+
+Create load balancer
+
+Wait:
+
+2–5 minutes
+
+Status becomes:
+
+Active
+STEP 16 — Copy DNS Name
+
+Open ALB.
+
+Copy:
+
+DNS name
+
+Example:
+
+my-alb-123456.us-east-1.elb.amazonaws.com
+STEP 17 — Open in Browser
+
+Paste DNS into browser.
+
+Refresh multiple times.
+
+You should alternately see:
+
+This is Server 1
+
+and
+
+This is Server 2
+==================================================
