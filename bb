@@ -207,6 +207,25 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': 'Message processed successfully'
     }
+Step 10: Configure Lambda as Consumer
+Now configure Lambda to automatically process messages from SQS.
+Create Lambda Function
+1.Search Lambda in AWS Console
+2.Open AWS Lambda
+3.Click Create Function
+Configure:
+* Author from scratch
+* Function name → SQSConsumerFunction
+* Runtime → Python 3.x
+Click Create function
+
+Add SQS Trigger
+1.Open SQSConsumerFunction
+2.Click Add Trigger
+3.Select SQS
+4.Choose MyS3Queue
+Click Add
+Now Lambda will automatically read messages from SQS.
 
 ----------------------------------------------------------------------------------------------------------------
 //week-9-elb
