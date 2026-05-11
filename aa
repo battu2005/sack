@@ -86,7 +86,7 @@ and do same for efs2 powershell
 
 6.efs->select target efs->actions->attach->mount via dns->copy command->and paste in both powershell->before paste if u get an error type mkdir efs and paste it in both cmd
 
-7.in efs1->cd directoryname->touch file.txt->echo "hello">file.txt->ls
+7.in efs1->cd directoryname(will there in mount command atlast)->touch file.txt->echo "hello">file.txt->ls
 and in efs2 type  cd directory name ->ls you should get->to check in 2nd cmd type cat filename.txt
 
 
