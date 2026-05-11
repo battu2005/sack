@@ -1,626 +1,409 @@
-//Testing IoT Device Security (default passwords, open ports)
-open docker and then open cmd
-type docker run -d -p 8090:3000 --name juiceshop bkimminich/juice-shop
-in browser open http://localhost:8090
-then type ipconfig->note wireless lan adapter ipv4 address
-open kali linux->nmap localhost->nmap -sV ipv4 address
-open juiceshop and login->right click->inspect->network
-then do again any login-> you will get some responses then click on anything
-==================================================================================================================================================================================================================
-komal 
-//DIGITAL FORENSICS USING AUTOPSY (STEP-BY-STEP)
-STEP 1: Open Terminal
-echo "Cybersecurity Lab Evidence" > /home/kali/evidence.txt
-ls /home/kali
-dd if=/dev/zero of=/home/kali/practice_disk.dd bs=1M count=100
-mkfs.ext4 /home/kali/practice_disk.dd
-mkdir /home/kali/mountdir
-sudo mount -o loop /home/kali/practice_disk.dd /home/kali/mountdir
-sudo cp /home/kali/evidence.txt /home/kali/mountdir/
-ls /home/kali/mountdir
-Must show->evidence.txt
-sudo umount /home/kali/mountdir
+//week-7 lambda
+1.create s3 bucket->name->remaining default settings and click create bucket
+2.create dynamodb->table name->partition key-unique-.click create table
+3.go to lambda->create function->author from scratch->name->python-3.14->additonal settings->
+customise execution role->create role->use existing->lab role->create function
+4.paste code 
+import boto3
+from uuid import uuid4
 
- STEP 9: Install dc3dd (if not installed)
+def lambda_handler(event, context):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('newtable') // write dynamodb table name
 
-sudo apt update
-sudo apt install dc3dd -y
+    if 'Records' in event:
+        for record in event['Records']:
+            bucket_name = record['s3']['bucket']['name']
+            object_key = record['s3']['object']['key']
+            size = record['s3']['object'].get('size', -1)
+            event_name = record.get('eventName', 'Unknown')
+            event_time = record.get('eventTime', 'Unknown')
 
-sudo dc3dd if=/home/kali/practice_disk.dd of=/home/kali/disk_image.dd hash=md5 log=/home/kali/acquisition.log
+            table.put_item(
+                Item={
+                    'unique': str(uuid4()),
+                    'Bucket': bucket_name,
+                    'Object': object_key,
+                    'Size': size,
+                    'Event': event_name,
+                    'EventTime': event_time
+                }
+            )
+    else:
+        print("No Records found")
+5.click deploy->click add trigger->s3->use s3 table
+6.upload the file in s3 .  in dynamodb->your table->explore table items->file should visible
+----------------------------------------------------------------------------------------------------------------------
+//week-13-attaching iam to ec2
+1.log in into free tier account
+2.Roles->create role->aws service->under use case select ec2
+3.attach policy->Amazons3FullAccess , role name-anything-.click on create role
+4.create ec2 instance
+5.after creating select the created instance and->
+click action-.security->modify Iam role->
+select the created role-.update
+6.connect the Ec2 instance (SSh client) and open cmd->
+type aws s3 ls if you get any aws not installed command
+7.install  sudo apt-get update -y-> sudo apt install awscli -y->aws --version
+8.aws s3 ls
+9.aws ec2 decribe-instances after writing in cmd should get an error
+-------------------------------------------------------------------------------------------------------------------------
+//week-11-amazon lex
+1.log in into free tier account
+2.amazon lex->create bot->
+Choose:Create a blank bot->
+Enter:Bot name: HotelBookingBot->
+IAM role → Create new role->
+Remaining defaultnext->Language: English->Voice (optional)->Click Done
+3.Intents->Name: BookHotel->Click Create
+4.Add any 4 utterences
+5.slot->add slot->name;age , type:amazon.Number , prompt:What is your age?
+6.in age click on prompt->advanced options->
+success response->conditional brancing->{age}<18->
+message:you are not eligible-.save
+7.again add slot->name:location , type:amazon.city , prompt:which city do you want?
+8.again add slot->name:checkin , type:Amazon.date , prompt:what is your checkindate?
+9.again add slot->name:nights , type:Amazon.Number , prompt:how many nights do you stay?
+10.go back and in slot types->add slot type->add blank slot type->name:RoomType
+11.add values as single,double,suite and save 
+12.in intent->slot->add slot->name:Rooomtype , value select roomtype , prompt:what is your room type?
+13.select the roomtype->advanced options->slot prompt->more prompt options->add->add card group->title , buuton-> add button
+values are single , double , suite
+14.give initial and confirmation response and click build and test
+----------------------------------------------------------------------------------------------------------------------------
+//week-12-GUI and CLI
+PART A: GUI ACCESS (Management Console)
 
-ls -lh /home/kali/disk_image.dd or ls disk_image.dd
-cat /home/kali/acquisition.log
-STEP 12: Install Autopsy (if needed)
-sudo apt install autopsy -y
+STEP 1: Login
+Login to AWS as Root/Admin
 
-STEP 13: Start Autopsy
+STEP 2: Open IAM
+Go to IAM → Users → Create user
 
-sudo autopsy
-Copy URL:
-http://localhost:9999/autopsy or right click and open in tab 
+STEP 3: User Details
+Enter name: S3_Specialist
+Enable: Provide user access to AWS Management Console
+Set custom password
 
-* Click **Create New Case**
-* Case Name: `KaliLab`
-* Description: anything
-* Investigator: your name
-  Click **Next → Finish**
-Host Name: `KaliLabMachine`
-  Click **Next**
-STEP 17: Add Image
+STEP 4: Permissions
+Select: Attach policies directly
+Choose: AmazonS3FullAccess
+
+STEP 5: Create User
+Review → Create user
+Download .csv file (contains login details)
+
+STEP 6: Sign Out
+Copy Account ID → Logout
+
+STEP 7: Login as IAM User
+Use sign-in URL → Enter Account ID, username, password
+
+STEP 8: Testing
+Test 1: Go to EC2 → Access Denied (expected)
+Test 2: Go to S3 → Create bucket (success)
+
+---PART B: CLI ACCESS (Programmatic Access)
+
+STEP 1: Generate Access Keys
+IAM → Users → Select user → Security credentials
+Create access key → Select CLI
+Download .csv
+
+STEP 2: Install CLI
+Install AWS CLI on your system
+
+STEP 3: Configure CLI
+Open CMD/Terminal → Run:
+
+aws configure
+
 Enter:
-/home/kali/disk_image.dd
-Select:
+Access Key ID
+Secret Access Key
+Region: ap-south-1
+Output: json
 
-* Disk ✔️
-* Symlink ✔️
-Click **Next → Finish**
-STEP 18: Analyze
-Select disk
-* Click **ANALYZE**
-* Click **Next → Next → Finish**
-STEP 19: File Analysis
-Click->FILE ANALYSIS->Browse and find->evidence.txt
-Open it → you will see->Cybersecurity Lab Evidence
-STEP 20: Keyword Search
-Click->KEYWORD SEARCH
-Search:
-Cybersecurity
-Click **Search**
-✔️ Click **link to results**
- STEP 21: Verify Result
-✔️ You will see:
+STEP 4: Test Commands
 
-* File name
-* Content
-* Match
-===================================================================================================================================================================================================================
-//network foresics
-Step 1: Open Wireshark
+aws s3 ls
+aws s3 mb s3://your-unique-bucket-name
+aws iam list-users
+--------------------------------------------------------------------------------------------------------------------------------
+//week-10-elastic beanstalk
+->Login to AWS Console(not free tier)
+->Under Compute section ->Search for Elastic Beanstalk
+->Click Create Application
+->Create Application
+->Enter Application Name (e.g., MyApp)
+->Add description (optional)
+->Click Create
+->Create Environment
+->Click Create Environment
+->Choose:Web Server Environment (for web apps)
+->Click Select
+->Configure Environment
+->Enter Environment Name
+->Choose Platform:
+->Java (for .war)
+->Node.js / Python / PHP / etc.-for .zip
+->Under Application Code:
+->Select Upload your code
+->Upload your .war or .zip file
+->Configure Service Access
+->Service Role → Select existing  -LabRole
+->EC2 Key Pair → Optional (for SSH)
+->EC2 Instance Profile → select (e.g., LabInstanceProfile)
+->Select VPC (default is fine)
+->Select Subnets
+->Enable Public IP
+->Choose Instance type (e.g., t2.micro – free tier)
+->Set:
+->Min instances: 1
+->Max instances: 2 (or more)
+->review and click create
+->in domain area you will get and domain link , open in browser app run
 
-Open terminal:
+for .zip file
+if they wont provide create a two files
+1.application.py
+from flask import Flask
 
-wireshark &
-Step 2: Select Network Interface
+application = Flask(__name__)
 
-  * **wlan0** (WiFi) OR
-  * **eth0** (Ethernet)
-* Click **Start (shark icon)**
+@application.route('/')
+def home():
+    return "Hello from AWS Elastic Beanstalk 🚀"
 
-✔️ Packet capturing begins
+2.requirements.txt
+write content as flask
 
-Step 3: Generate Traffic
+Then select both the file->right click->to zip
+-------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------
+//sns
+firrst open sns->toppic->statndared->name ->create topic
+create subscription->protocol:emial,endpoint mana email
+next send message lo Edina msg ichi send
 
-Open a new terminal:
+s3 to sns
 
-ping google.com
+create s3 bucket
+create with name->and create->open properties->in that event notification create->event types->all->ssns topic->choose ours-
+>save->upload a file->the mail will come
 
-OR open browser → any website
-
-✔️ Packets will start appearing
-
-Step 4: Protocol Analysis
-
-Apply filters:
-
-tcp
-
-udp
-
-http
-
-Step 5: Apply IP Address Filter
-
-Use your IP:
-
-ip.addr == 192.168.1.97
-
-Step 6: Source / Destination Filters
-
-* Source:
-
-ip.src == 192.168.1.97
-
-
-* Destination:
-
-ip.dst == 192.168.1.97
-Step 7: Follow TCP Stream
-Steps:
-
-1. Select any TCP packet
-2. Right click → **Follow → TCP Stream**
-Step 8: Identify Suspicious Traffic
-
-Open new terminal:
-
-nmap -sS 192.168.0.156//your ip
-
-Apply filter in Wireshark:
-
-tcp.flags.syn == 1 && tcp.flags.ack == 0
- Step 9: Capture File Properties
-
-Go to:Statistics → Capture File Properties
-
-Step 10: Resolved Addresses
-
-Statistics → Resolved Addresses
-
-✔️ Converts:
-
-* IP → Domain name
-* MAC → Device name
-Step 11: Protocol Hierarchy
-Statistics → Protocol Hierarchy
-
-Step 12: Conversations
-Statistics → Conversations
-
-Step 13: Packet Length
-
-Statistics → Packet Length
- Step 14: Endpoints
-
-Statistics → Endpoints
-
-Step 15: I/O Graph
+sqs
+name->stamdard->create
+sned and recive msgs->write somenting and click send->down poll msgs poll it u get over there
+sns->create subscription->amazons sqs->our sqs
+now s3 -> upload 
+send and messages lo poll msgs our upladed item will come in sqs
+----------------------------------------------------------------------------------------------------------------
+//week-9-elb
+Step-by-Step: AWS Application Load Balancer (ALB) with 2 EC2 Web Servers
+STEP 1 — Launch EC2 Instance 1
 
 Go to:
-Statistics → I/O Graph
 
-⚙️ Setup
+AWS EC2 Console
 
-* Enable Graph 1
-* Y-axis → Packets
+Click:
+Launch instance
+Configure
+Field	Value
+Name	webserver-1
+AMI	Amazon Linux
+Instance type	t2.micro
+Key pair	Select existing key
+Network Settings
 
-Observation
+Allow:
 
-* X-axis → Time
-* Y-axis → Packets
+Type	Source
+HTTP	Anywhere
+SSH	My IP / Anywhere
 
-✔️ Spikes → heavy traffic
-✔️ Flat → low traffic
-=================================================================================================================================================================================================================
-cd /var/log 
-ls
-last
-journalctl | less
-journalctl | grep ssh
-journalctl | less    
-journalctl | grep "Failed"lsls
-journalctl | grep ssh     
-journalctle | grep -i error
-grep "404" /var/log/apache2/access.log
-journalctl | grep -i error 
-cd /var/log/apache2
-ls
-sudo less access.log       
-grep "404" /var/log/apache2/access.log
-less /var/log/dpkg.log
+Launch instance.
 
-part a
-sudo journalctl -f  
- sudo apt install openssh-server -y
-sudo service ssh start
-ip a
-sudo service ssh start
-└─$ journalctl | grep "Failed password"
-└─$ journalctl | grep "Failed password" | awk '{print $13}' | sort | uniq -c | sort -nr
+STEP 2 — Connect to webserver-1
 
-└─$ journalctl | grep "Failed password" | awk '{print $13}' | sort | uniq -c | sort -nr
-if u wont get output type sudo service ssh start and then ssh fakeuser@localhost
-->then again type journalctl big command
+SSH:
 
- part b
-└─$ sudo apt update
-└─$ sudo apt install util-linux -y
-└─$ sudo lastb
-=================================================================================================================================================================================================================
-Title: Privacy Audit of Popular Apps (Desktop WhatsApp) and Websites (Facebook) & Data Breach Case Study Analysis
-## ✅ Step 1: Open Kali Terminal
+ssh -i "your-key.pem" ec2-user@PUBLIC-IP
+STEP 3 — Install Apache on webserver-1
 
-```bash
-Ctrl + Alt + T
-## ✅ Step 2: Install Node.js & npm
-```bash
-sudo apt update
-sudo apt install nodejs npm -y
+Run:
 
-## ✅ Step 3: Install Nativefier
-sudo npm install -g nativefier
-nativefier https://web.whatsapp.com
-web-whatsapp-linux-x64
-## ✅ Step 5: Open WhatsApp Desktop
-cd web-whatsapp-linux-x64
-./WhatsAppWeb
-## ✅ Step 6: Login
-👉 QR code appears
-👉 Open WhatsApp on phone → Linked Devices → Scan QR
+sudo yum install httpd -y
 
-✔️ Now WhatsApp works on Kali
+Start Apache:
 
-# 🔍 Step 7: Start Wireshark
+sudo systemctl start httpd
 
-```bash
-wireshark
-## Select Interface
-👉 Choose:eth0 OR wlan0
-👉 Click **Start Capture**
+Create webpage:
 
+echo "This is Server 1" | sudo tee /var/www/html/index.html
+STEP 4 — Launch EC2 Instance 2
 
-## ✅ Step 8: Generate Traffic
+Repeat same steps.
 
-In WhatsApp:
+Configure
+Field	Value
+Name	webserver-2
+AMI	Amazon Linux
+Instance type	t2.micro
 
-* Send messages
-* Send images
-* Open chats
+Launch.
 
----
+STEP 5 — Connect to webserver-2
 
-## ✅ Step 9: Apply Filters
+SSH:
 
-In Wireshark filter bar:
-tls
-or
+ssh -i "your-key.pem" ec2-user@PUBLIC-IP
+STEP 6 — Install Apache on webserver-2
 
-dns
+Run:
 
-//facebook
-//facebook
-https://www.facebook.com
-open->burpsuite
-go to proxy->click options->interface:127.0.0.1:8080
-in browser configuration->open firefix->go to ettings->network settings->manual proxy configuration->http proxy:127.0.0.1 port 8080
-tick this proxy server for all prorocols
-turn on incercept on burppsuite
-reload facebook
-Look for:
+sudo yum install httpd -y
 
-Cookie:
-datr=
-fr=
-c_user=
-xs=
-Look inside request headers.
+Start Apache:
 
-Example:
+sudo systemctl start httpd
 
-User-Agent:
-Cookie:
-Referer:
-Origin:
-Authorization:
+Create webpage:
 
-These headers contain browser and session information.
-Now press:
+echo "This is Server 2" | sudo tee /var/www/html/index.html
+STEP 7 — Create Security Group for Load Balancer
 
-F12
+Go to:
 
-Open:
+EC2 → Security Groups
 
-Developer Tools → Network Tab
+Click:
+Create security group
+Configure
+Field	Value
+Security group name	lb-sg
+Description	Load balancer SG
+VPC	Default
+Add Inbound Rule
+Type	Source
+HTTP	0.0.0.0/0
 
-Refresh Facebook again.
-TEP 11: Observe Third-Party Requests
+Create security group.
 
-Look for requests to:
+STEP 8 — Create Load Balancer
 
-analytics
-ads
-tracking domains
-CDN services
+Go to:
 
-Examples:
+EC2 → Load Balancers
 
-facebook.net
-doubleclick.net
-analytics
-pixel
-=================================================================================================================================================================================================================
+Click:
+Create Load Balancer
+Choose:
+Application Load Balancer
+Click:
+Create
+STEP 9 — Configure Load Balancer
+Field	Value
+Name	my-alb
+Scheme	Internet-facing
+IP type	IPv4
+STEP 10 — Select Network
+Setting	Value
+VPC	Default VPC
 
-## System Security Audit
+Select at least:
 
-## 🔹 STEP 1: System Information
-Windows + R → msinfo32
-**Check:** -> OS Version -> System Type
-**Observation:**
-The system information was obtained using the msinfo32 tool. The system is running on Microsoft Windows 11 Home Single Language, 64-bit operating system, with Intel i5 processor and UEFI-based architecture. Secure Boot is enabled, indicating a secure boot configuration. Secure Boot enhances system security by preventing unauthorized boot loaders.
+2 Availability Zones
 
-## 🔹 STEP 2: Check Windows Updates
-Settings → Windows Update → Check for updates
-**Observation:**
-The Windows Update section was checked, and it was found that updates are available and pending installation. The system requires a restart to complete the update process. Pending updates may expose the system to known vulnerabilities. Regular updates are essential to maintain system security.
+AWS automatically selects subnets.
 
-## 🔹 STEP 3: Check Firewall Status
-Search → Windows Defender Firewall → Turn Windows Defender Firewall on or off
-**Observation:**
-The firewall settings were checked and it was observed that firewall management is handled by Kaspersky antivirus, indicating that a third-party firewall is active. This ensures network protection, although misconfiguration may still pose risks.
+STEP 11 — Attach Security Group
 
-## 🔹 STEP 4: Check Antivirus Status
-Windows Security → Virus & Threat Protection
-**Check:**->* Real-time protection → ON and Last scan → Recent
+Select:
 
-**Observation:**
-The antivirus status was verified and Kaspersky antivirus is active. No threats were detected and protection settings are functioning properly. Antivirus software provides protection against malware and cyber threats.
+lb-sg
+STEP 12 — Create Target Group
 
-## 🔹 STEP 5: Check Password & Account Security
-Settings → Accounts → Sign-in options
-**Check:** Password / PIN enabled and  Windows Hello (optional)
+Under:
 
-**Observation:**
-The system uses secure authentication methods such as password and PIN. This ensures secure access and prevents unauthorized login.
-
-## 🔹 STEP 6: Check Installed Applications
-Settings → Apps → Installed apps
-**Check:**
-* Unknown software and Cracked tools
-**Observation:**
-The installed applications were reviewed and no suspicious or unauthorized software was found. Avoiding unverified software helps prevent malware risks.
-
-## 🔹 STEP 7: Check Startup Programs
-**Steps:**
-Ctrl + Shift + Esc → Startup tab
-* Disable unknown apps
-
-**Observation:**
-Startup applications were analyzed and some unnecessary apps were enabled. Disabling them improves system performance and reduces security risks.
-## 🔹 STEP 8: Check Network Security
-
-**Steps:**
-Settings → Network & Internet
-check
-* Wi-Fi connection
-* Network type (Private/Public)
-
-**Observation:**
-The system is connected to Wi-Fi and configured as a Public network. This restricts device visibility and enhances security in untrusted environments.
-
-## 🔹 STEP 9: Check Browser Security
-Browser → Settings → Privacy & Security
-
-**Check:**Safe browsing → ON and Remove unknown extensions
-
-**Observation:**
-Safe browsing is enabled, protecting against malicious websites and unsafe downloads. This helps prevent phishing and malware attacks.
-## 🔹 STEP 10: Check Data Backup
-
-**Steps:**
-Search → Backup settings
-**Check:**
-
-* OneDrive / External backup
-
-**Observation:**
-Backup settings were checked and it was observed that backup is not configured. Lack of backup may lead to data loss in case of system failure or cyber attacks such as ransomware.
-==================================================================================================================================================================================================================
-//android studio
-Step 2: Create Android Virtual Device (AVD)
-Open AVD Manager
-Open Android Studio.
+Listeners and routing
 
 Click:
 
-Tools → Device Manager
-
-Click:
-
-Create Device
-Select Device
-
-Choose any device:
-
-Pixel 2
-Pixel 9
+Create target group
+Configure
+Field	Value
+Target type	Instance
+Name	web-servers-tg
+Protocol	HTTP
+Port	80
+VPC	Default
 
 Click:
 
 Next
-Select Android Version
-Download any Android API version.
+STEP 13 — Register Targets
 
-Recommended:
+Select:
 
-API 36
-
-Click:
-
-Finish
-
-Now AVD is created.
-
-Step 3: Start AVD from Command Prompt
-Open Command Prompt
-
-Type:
-
-cd C:\Users\Admin\AppData\Local\Android\Sdk\emulator
-
-Then check available AVDs:
-
-emulator -list-avds
-
-Example Output:
-
-Medium_Phone_API_36.1
-Pixel_2
-Pixel_9
-Start Emulator with Proxy
-
-Run:
-
-emulator -avd Pixel_9 -http-proxy http://10.0.2.2:8080
-
-Now Android Emulator starts.
-
-Step 4: Setup Proxy Inside Emulator
-Method 1 – Manual Proxy Setup
-
-Inside Emulator:
-
-Settings
-→ Network & Internet
-→ Internet
-→ Select Connected Network
-→ Edit Icon (Top Right)
-→ Advanced Options
-→ Proxy
-→ Manual
-
-Enter:
-
-Hostname : 10.0.2.2
-Port     : 8080
+webserver-1
+webserver-2
 
 Click:
 
-Save
-Step 5: If Save Option Does Not Work (ADB Method)
-Open Another Command Prompt
+Include as pending below
 
-Type:
+Then:
 
-cd C:\Users\Admin\AppData\Local\Android\Sdk\platform-tools
+Create target group
+STEP 14 — Attach Target Group to Load Balancer
 
-Check emulator connection:
-
-adb devices
-
-Example Output:
-
-List of devices attached
-emulator-5554   device
-Set Proxy Using ADB
-
-Run:
-
-adb shell settings put global http_proxy 10.0.2.2:8080
-
-Verify proxy:
-
-adb shell settings get global http_proxy
-
-Expected Output:
-
-10.0.2.2:8080
-Step 6: Configure Burp Suite
-
-Open Burp Suite.
-
-Go to:
-
-Proxy → Options
+Go back to Load Balancer creation page.
 
 Under:
 
-Proxy Listeners
-
-Click:
-
-Edit
+Default action
 
 Select:
 
-All Interfaces
+web-servers-tg
+STEP 15 — Create Load Balancer
 
 Click:
 
-OK
+Create load balancer
 
-Now turn interception ON:
+Wait:
 
-Proxy → Intercept → Intercept ON
+2–5 minutes
 
-Burp Suite is now listening on port:
+Status becomes:
 
-8080
-Step 7: Capture HTTP Traffic
+Active
+STEP 16 — Copy DNS Name
 
-Inside Emulator:
+Open ALB.
 
-Open Google Chrome.
+Copy:
 
-Visit:
+DNS name
 
-http://example.com
+Example:
 
-Now in Burp Suite:
+my-alb-123456.us-east-1.elb.amazonaws.com
+STEP 17 — Open in Browser
 
-Proxy → HTTP History
+Paste DNS into browser.
 
-You can see captured HTTP requests and responses.
+Refresh multiple times.
 
-Step 8: Export Burp Suite CA Certificate
+You should alternately see:
 
-To intercept HTTPS traffic:
+This is Server 1
 
-In Burp Suite:
+and
 
-Proxy → Options
-→ Import / Export CA Certificate
-
-Choose:
-
-Certificate in DER format
-
-Save file as:
-
-burpcer.der
-
-Save it in:
-
-Downloads Folder
-Step 9: Send Certificate to Emulator
-
-Open Command Prompt:
-
-cd C:\Users\Admin\AppData\Local\Android\Sdk\platform-tools
-
-Run:
-
-adb push C:\Users\Admin\Downloads\burpcer.der /sdcard/Download/
-
-Expected Output:
-
-1 file pushed
-Step 10: Install Certificate in Emulator
-
-Inside Emulator:
-
-Settings
-→ Security & Privacy
-→ More Security & Privacy
-→ Encryption & Credentials
-→ Install a Certificate
-→ CA Certificate
-
-Select:
-
-burpcer.der
-
-Confirm installation.
-
-Now HTTPS traffic can be intercepted.
-
-Step 11: Verify HTTPS Interception
-
-Inside Emulator Browser:
-
-Visit:
-
-https://example.com
-
-Now open Burp Suite:
-
-Proxy → HTTP History
-
-You can now see:
-
-HTTPS requests
-HTTPS responses
-Headers
-Cookies
-Parameters
-5. Result
-
-Android application network traffic was successfully intercepted and analysed using Burp Suite by configuring proxy settings in the Android emulator and installing the Burp Suite CA certificate.
+This is Server 2
+==================================================
