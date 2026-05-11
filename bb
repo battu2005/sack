@@ -253,6 +253,8 @@ sudo systemctl start httpd
 Create webpage:
 
 echo "This is Server 1" | sudo tee /var/www/html/index.html
+or 
+echo  "This is Server 2" > /var/www/html/index.html
 STEP 4 — Launch EC2 Instance 2
 
 Repeat same steps.
@@ -283,6 +285,8 @@ sudo systemctl start httpd
 Create webpage:
 
 echo "This is Server 2" | sudo tee /var/www/html/index.html
+or 
+echo  "This is Server 2" > /var/www/html/index.html
 STEP 7 — Create Security Group for Load Balancer
 
 Go to:
