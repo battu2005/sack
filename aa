@@ -193,7 +193,7 @@ Connectivity type → Public->Elastic IP → Select allocated EIP->Click Create
 2.Route table->private route table->routes->edit->0.0.0.0,nat gateway
 
 3.in cmd->scp -i public-ins2.pem privet-ins2.pem ubuntu@3.91.60.117(public instance ipv4):/home/ubuntu/->
-copy the public ssh ->inside chmod 400 cmnd->copy private ssh->chmod 400.pemfilename->ping google.com
+copy the public ssh ->inside chmod 400 public.pemfilename->copy private ssh->chmod 400.pemfilename->ping google.com
 
 -------------------------------------------------------------------------------------------------------------------------
 
