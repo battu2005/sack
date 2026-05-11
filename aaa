@@ -134,7 +134,7 @@ g. Click on the "Create Snapshot" button to initiate the snapshot creation proce
 10.after created the snapshot go to snapshot in ec2->
 select the snapshot you just created.->
 Click on the "Actions" dropdown menu above the snapshot list and select "Copy Snapshot."->
-d. Choose the destination region where you want to copy the snapshot.->
+d. Choose the destination region where you want to copy the snapshot.(us-west-2)->
 e. Click on the "Copy Snapshot" button to initiate the copy process. T
 his may take some time depending on the size of the snapshot and the network speed.
 
@@ -167,7 +167,7 @@ in public subnet->actions->edit subnet settings->enable
 3.internet gateway->create->name:custom->igw->attach to vpc
 
 4.route table->create->name:public->
-select vpc->add route->0.0.0.0,target:Internet Gateway->subnet associations->
+select vpc-> and after creating in actions->edit routes tables->add route->0.0.0.0,target:Internet Gateway->subnet associations->
 edit->select public->save and for private->name:private->
 select vpc->
 create->subnet associations->edit->click private->save
@@ -175,7 +175,7 @@ create->subnet associations->edit->click private->save
 5.ec2->launch instance->name:public->
 network settings->edit->select vpc->public subnet->
 inbound rules->1.http , anywhere - 2.https,anywhere->
-another for private but in network dont add anything
+another for private but in network select vpc and subnet choose private and remaining default
 
 6.copy the public ssh and paste after that type ping google.com
 
@@ -192,7 +192,7 @@ Connectivity type → Public->Elastic IP → Select allocated EIP->Click Create
 
 2.Route table->private route table->routes->edit->0.0.0.0,nat gateway
 
-3.in cmd->scp -i public-ins2.pem privet-ins2.pem ubuntu@3.91.60.117:/home/ubuntu/->
+3.in cmd->scp -i public-ins2.pem privet-ins2.pem ubuntu@3.91.60.117(public instance ipv4):/home/ubuntu/->
 copy the public ssh ->inside chmod 400 cmnd->copy private ssh->chmod 400.pemfilename->ping google.com
 
 -------------------------------------------------------------------------------------------------------------------------
