@@ -115,7 +115,7 @@ now you should see /dev/xvdf1->sudo mkfs.ext4 /dev/xvdf1->lsblk -fs
 5.sudo mkdir /mnt/komal->sudo mount /dev/xvdf1 /mnt/komal->df -h
 
 6.sudo blkid /dev/xvdf1->
-copy the UUID=""->sudo nano /etc/fstab->at last line paste UUID="" /mnt/archana   ext4   defaults,nofail   0   0->sudo mount -a->
+copy the UUID=""->sudo nano /etc/fstab->at last line paste UUID="" /mnt/archana   ext4   defaults,nofail   0   0,ctrl+o , enter , ctrl+x->sudo mount -a->
 df -h->cd /mnt/komal->sudo touch /mnt/komal/f1->ls
 
 7.if needed reboot or dont do it 
@@ -125,6 +125,10 @@ Detach volume->Attach to Another EC2 Instance (Same AZ)->
 Attach the volume to a new instance->
 Log in to the new instance->
 Create mount directory:mkdir /mnt/archana->Mount the existing partition:
+sudo mkdir /mnt/archana
+sudo mount /dev/xvdf2 /mnt/archana
+df -h
+ls /mnt/archana
 
 9.snaphot->ec2->volumes->Select the EBS volume you want to create a snapshot of->
 e. Click on the "Actions" dropdown menu above the volume list and select "Create Snapshot."->
